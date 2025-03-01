@@ -183,7 +183,9 @@ fun AlcoholGasolineCalculationScreen(onBack: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Álcool (preço por litro)", fontSize = 16.sp)
+        val context = LocalContext.current
+
+        Text(text = context.getString(R.string.alcohol_price), fontSize = 16.sp)
         OutlinedTextField(
             value = alcoholPrice,
             onValueChange = { alcoholPrice = it },
@@ -194,7 +196,7 @@ fun AlcoholGasolineCalculationScreen(onBack: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Gasolina (preço por litro)", fontSize = 16.sp)
+        Text(text = context.getString(R.string.gasoline_price), fontSize = 16.sp)
         OutlinedTextField(
             value = gasolinePrice,
             onValueChange = { gasolinePrice = it },
@@ -206,7 +208,7 @@ fun AlcoholGasolineCalculationScreen(onBack: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Column {
-            Text(text = "Escolha a porcentagem", fontSize = 16.sp)
+            Text(text = context.getString(R.string.choose_percentage), fontSize = 16.sp)
             SingleChoiceSegmentedButtonRow(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -244,7 +246,7 @@ fun AlcoholGasolineCalculationScreen(onBack: () -> Unit) {
                 }
             }
         }) {
-            Text("Calcular")
+            Text(text = context.getString(R.string.calculate))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -254,7 +256,7 @@ fun AlcoholGasolineCalculationScreen(onBack: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = onBack) {
-            Text("Voltar")
+            Text(text = context.getString(R.string.go_back))
         }
     }
 }
@@ -271,32 +273,34 @@ fun AddEditStationDialog(
     var gasolinePrice by remember { mutableStateOf(station?.gasolinePrice?.toString() ?: "") }
     var location by remember { mutableStateOf(station?.location ?: "") }
 
+    val context = LocalContext.current
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (station == null) "Adicionar Posto" else "Editar Posto") },
+        title = { Text(if (station == null) context.getString(R.string.add_station) else context.getString(R.string.edit_station) ) },
         text = {
             Column {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Nome do Posto") }
+                    label = { Text(text = context.getString(R.string.name_station)) }
                 )
                 OutlinedTextField(
                     value = alcoholPrice,
                     onValueChange = { alcoholPrice = it },
-                    label = { Text("Preço do Álcool") },
+                    label = { Text(text = context.getString(R.string.alcohol_price_text)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 OutlinedTextField(
                     value = gasolinePrice,
                     onValueChange = { gasolinePrice = it },
-                    label = { Text("Preço da Gasolina") },
+                    label = { Text(text = context.getString(R.string.gasoline_price_text)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 OutlinedTextField(
                     value = location,
                     onValueChange = { location = it },
-                    label = { Text("Localização") }
+                    label = { Text(text = context.getString(R.string.location)) }
                 )
             }
         },
@@ -311,13 +315,13 @@ fun AddEditStationDialog(
                 )
                 onSave(newStation)
             }) {
-                Text("Salvar")
+                Text(context.getString(R.string.save))
             }
         },
         dismissButton = {
             if (onDelete != null) {
                 Button(onClick = onDelete) {
-                    Text("Excluir")
+                    Text(context.getString(R.string.delete))
                 }
             }
         }

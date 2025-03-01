@@ -8,4 +8,14 @@
     <string name="location">Localização</string>
     <string name="date">Data</string>
     <string name="add_station">Adicionar posto</string>
+    <string name="alcohol_price">Álcool (preço por litro)</string>
+    <string name="gasoline_price">Gasolina (preço por litro)</string>
+    <string name="choose_percentage">Escolha a porcentagem</string>
+    <string name="calculate">Calcular</string>
+    <string name="edit_station">Editar posto</string>
+    <string name="name_station">Nome do posto</string>
+    <string name="alcohol_price_text">Preço do Álcool</string>
+    <string name="gasoline_price_text">Preço da gasolina</string>
+    <string name="save">Salvar</string>
+    <string name="delete">Excluir</string>
 </resources>

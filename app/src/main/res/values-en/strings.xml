@@ -8,4 +8,14 @@
 <string name="location">Location</string>
 <string name="date">Date</string>
 <string name="add_station">Add gas station</string>
+<string name="alcohol_price">Alcohol (price per liter)</string>
+<string name="gasoline_price">Gasoline (price per liter)</string>
+<string name="choose_percentage">Choose the percentage</string>
+<string name="calculate">Calculate</string>
+<string name="edit_station">Edit gas station</string>
+<string name="name_station">Name of the gas station</string>
+<string name="alcohol_price_text">Alcohol price</string>
+<string name="gasoline_price_text">Gasoline price</string>
+<string name="save">Save</string>
+<string name="delete">Delete</string>
 </resources>
