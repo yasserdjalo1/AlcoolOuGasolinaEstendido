@@ -1,0 +1,11 @@
+<resources>
+<string name="app_name">Alcohol or Gasoline</string>
+<string name="see_gas_stations">See Gas Stations</string>
+<string name="calculate_alc_gas">Calculate Alcohol/Gasoline</string>
+<string name="go_back">Go back</string>
+<string name="alcohol">Alcohol</string>
+<string name="gasoline">Gasoline</string>
+<string name="location">Location</string>
+<string name="date">Date</string>
+<string name="add_station">Add gas station</string>
+</resources>

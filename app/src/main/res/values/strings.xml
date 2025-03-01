@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Álcool ou Gasolina</string>
+    <string name="see_gas_stations">Ver postos de gasolina</string>
+    <string name="calculate_alc_gas">Calcular Álcool/Gasolina</string>
+    <string name="go_back">Voltar</string>
+    <string name="alcohol">Álcool</string>
+    <string name="gasoline">Gasolina</string>
+    <string name="location">Localização</string>
+    <string name="date">Data</string>
+    <string name="add_station">Adicionar posto</string>
 </resources>
