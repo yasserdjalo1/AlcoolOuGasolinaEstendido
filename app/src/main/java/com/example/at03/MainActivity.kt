@@ -173,7 +173,8 @@ fun FuelStationList(
 fun AlcoholGasolineCalculationScreen(onBack: () -> Unit) {
     var alcoholPrice by remember { mutableStateOf("") }
     var gasolinePrice by remember { mutableStateOf("") }
-    var selectedPercentage by remember { mutableStateOf(70) }
+    val context = LocalContext.current
+    var selectedPercentage by remember { mutableStateOf(loadSelectedPercentage(context)) }
     var resultMessage by remember { mutableStateOf("") }
 
     Column(
@@ -221,6 +222,7 @@ fun AlcoholGasolineCalculationScreen(onBack: () -> Unit) {
                         ),
                         onClick = {
                             selectedPercentage = if (label == "70%") 70 else 75
+                            saveSelectedPercentage(context, selectedPercentage)
                         },
                         selected = selectedPercentage == if (label == "70%") 70 else 75,
                         label = { Text(label) }
@@ -364,4 +366,16 @@ fun deleteFuelStation(context: Context, index: Int) {
         stations.removeAt(index)
         saveFuelStations(context, stations)
     }
+}
+
+fun saveSelectedPercentage(context: Context, percentage: Int) {
+    val sharedPreferences = context.getSharedPreferences("FuelAppPrefs", Context.MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+    editor.putInt("selectedPercentage", percentage)
+    editor.apply()
+}
+
+fun loadSelectedPercentage(context: Context): Int {
+    val sharedPreferences = context.getSharedPreferences("FuelAppPrefs", Context.MODE_PRIVATE)
+    return sharedPreferences.getInt("selectedPercentage", 70) // 70 é o valor padrão
 }
