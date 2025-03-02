@@ -18,4 +18,13 @@
 <string name="gasoline_price_text">Gasoline price</string>
 <string name="save">Save</string>
 <string name="delete">Delete</string>
+<string name="location_unable">Unable to get location</string>
+<string name="location_denied">Location permission denied</string>
+<string name="location_capture">Capture Location</string>
+<string name="latitude_text">Latitude</string>
+<string name="longitude_text">Longitude</string>
+<string name="view_map_text">View on map</string>
+<string name="fill_all_fields_text">Please fill in all fields</string>
+<string name="alcohol_better">It\'s better to use alcohol!</string>
+<string name="gasoline_better">It\'s better to use gasoline!</string>
 </resources>

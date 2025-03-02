@@ -25,25 +25,63 @@ import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
 import com.example.at03.ui.theme.AT03Theme
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 
-// Definição da classe FuelStation
 data class FuelStation(
     val name: String,
     val alcoholPrice: Float,
     val gasolinePrice: Float,
     val location: String,
-    val date: String
+    val date: String,
+    val latitude: Double,
+    val longitude: Double
 ) : Serializable
 
 class MainActivity : ComponentActivity() {
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
+    }
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        checkLocationPermission()
         setContent {
             AT03Theme {
                 FuelCalculatorApp(context = this)
             }
         }
     }
+    private fun checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        }
+    }
+    private fun getLastLocation(onLocationReceived: (latitude: Double, longitude: Double) -> Unit) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location ->
+                    if (location != null) {
+                        onLocationReceived(location.latitude, location.longitude)
+                    }
+                }
+        }
+    }
+
 }
 
 @Composable
@@ -136,9 +174,9 @@ fun FuelStationList(
     onAddStation: () -> Unit,
     onBack: () -> Unit
 ) {
-    Column {
-        val context = LocalContext.current
+    val context = LocalContext.current
 
+    Column {
         Button(onClick = onBack) {
             Text(text = context.getString(R.string.go_back))
         }
@@ -156,6 +194,15 @@ fun FuelStationList(
                         Text(text = "${context.getString(R.string.gasoline)}: R$ ${stations[index].gasolinePrice}", fontSize = 14.sp)
                         Text(text = "${context.getString(R.string.location)}: ${stations[index].location}", fontSize = 14.sp)
                         Text(text = "${context.getString(R.string.date)}: ${stations[index].date}", fontSize = 14.sp)
+
+                        // Verifica se a latitude e longitude são diferentes de zero
+                        if (stations[index].latitude != 0.0 && stations[index].longitude != 0.0) {
+                            Button(onClick = {
+                                showLocationOnMap(context, stations[index].latitude, stations[index].longitude)
+                            }) {
+                                Text(text = context.getString(R.string.view_map_text))
+                            }
+                        }
                     }
                 }
             }
@@ -184,7 +231,6 @@ fun AlcoholGasolineCalculationScreen(onBack: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        val context = LocalContext.current
 
         Text(text = context.getString(R.string.alcohol_price), fontSize = 16.sp)
         OutlinedTextField(
@@ -238,13 +284,13 @@ fun AlcoholGasolineCalculationScreen(onBack: () -> Unit) {
             val gasoline = gasolinePrice.toFloatOrNull()
 
             resultMessage = if (alcohol == null || gasoline == null) {
-                "Por favor, preencha todos os campos."
+                context.getString(R.string.fill_all_fields_text)
             } else {
                 val threshold = gasoline * (selectedPercentage / 100.0)
                 if (alcohol <= threshold) {
-                    "Vale mais a pena usar Álcool!"
+                    context.getString(R.string.alcohol_better)
                 } else {
-                    "Vale mais a pena usar Gasolina!"
+                    context.getString(R.string.gasoline_better)
                 }
             }
         }) {
@@ -274,6 +320,8 @@ fun AddEditStationDialog(
     var alcoholPrice by remember { mutableStateOf(station?.alcoholPrice?.toString() ?: "") }
     var gasolinePrice by remember { mutableStateOf(station?.gasolinePrice?.toString() ?: "") }
     var location by remember { mutableStateOf(station?.location ?: "") }
+    var latitude by remember { mutableStateOf(station?.latitude?.toString() ?: "") }
+    var longitude by remember { mutableStateOf(station?.longitude?.toString() ?: "") }
 
     val context = LocalContext.current
 
@@ -304,6 +352,28 @@ fun AddEditStationDialog(
                     onValueChange = { location = it },
                     label = { Text(text = context.getString(R.string.location)) }
                 )
+                // Botão para capturar a localização
+                Button(onClick = {
+                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+                        fusedLocationClient.lastLocation
+                            .addOnSuccessListener { location ->
+                                if (location != null) {
+                                    latitude = location.latitude.toString()
+                                    longitude = location.longitude.toString()
+                                } else {
+                                    Toast.makeText(context, context.getString(R.string.location_unable), Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                    } else {
+                        Toast.makeText(context, context.getString(R.string.location_denied), Toast.LENGTH_SHORT).show()
+                    }
+                }) {
+                    Text(context.getString(R.string.location_capture))
+                }
+                // Exibir latitude e longitude capturadas
+                Text("${context.getString(R.string.location_capture)}: $latitude")
+                Text("${context.getString(R.string.location_capture)}: $longitude")
             }
         },
         confirmButton = {
@@ -313,7 +383,9 @@ fun AddEditStationDialog(
                     alcoholPrice = alcoholPrice.toFloatOrNull() ?: 0f,
                     gasolinePrice = gasolinePrice.toFloatOrNull() ?: 0f,
                     location = location,
-                    date = SimpleDateFormat("dd/MM/yyyy").format(Date())
+                    date = SimpleDateFormat("dd/MM/yyyy").format(Date()),
+                    latitude = latitude.toDoubleOrNull() ?: 0.0, // Salvar latitude
+                    longitude = longitude.toDoubleOrNull() ?: 0.0 // Salvar longitude
                 )
                 onSave(newStation)
             }) {
@@ -330,7 +402,6 @@ fun AddEditStationDialog(
     )
 }
 
-// Funções para manipular SharedPreferences
 fun saveFuelStations(context: Context, stations: List<FuelStation>) {
     val sharedPreferences = context.getSharedPreferences("FuelAppPrefs", Context.MODE_PRIVATE)
     val editor = sharedPreferences.edit()
@@ -378,4 +449,11 @@ fun saveSelectedPercentage(context: Context, percentage: Int) {
 fun loadSelectedPercentage(context: Context): Int {
     val sharedPreferences = context.getSharedPreferences("FuelAppPrefs", Context.MODE_PRIVATE)
     return sharedPreferences.getInt("selectedPercentage", 70) // 70 é o valor padrão
+}
+
+fun showLocationOnMap(context: Context, latitude: Double, longitude: Double) {
+    val gmmIntentUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude")
+    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+    mapIntent.setPackage("com.google.android.apps.maps")
+    context.startActivity(mapIntent)
 }

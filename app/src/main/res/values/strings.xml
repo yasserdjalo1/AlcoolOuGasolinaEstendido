@@ -18,4 +18,13 @@
     <string name="gasoline_price_text">Preço da gasolina</string>
     <string name="save">Salvar</string>
     <string name="delete">Excluir</string>
+    <string name="location_unable">Não foi possível obter a localização</string>
+    <string name="location_denied">Permissão de localização negada</string>
+    <string name="location_capture">Capturar Localização</string>
+    <string name="latitude_text">Latitude</string>
+    <string name="longitude_text">Longitude</string>
+    <string name="view_map_text">Ver no mapa</string>
+    <string name="fill_all_fields_text">Por favor, preencha todos os campos</string>
+    <string name="alcohol_better">Vale mais a pena usar Álcool!</string>
+    <string name="gasoline_better">Vale mais a pena usar Gasolina!</string>
 </resources>
